@@ -6,8 +6,8 @@ const decodeString = (source) => {
         if (/\d+/.test(source[index])) {
             const count = parseInt(source.substring(index));
             index += String(count).length;
-            const position = index++; // '['
-            stack.push({ count, position });
+            stack.push({ count, position: index });
+            ++index;
         } else if (source[index] === ']') {
             const { count, position } = stack.pop();
             const block = source.substring(position + 1, index);
@@ -27,6 +27,7 @@ const decodeString = (source) => {
     ['3[a]2[bc]', 'aaabcbc'],
     ['3[a2[c]]', 'accaccacc'],
     ['2[abc]3[cd]ef', 'abcabccdcdcdef'],
+    ['2[abc]3[cd]2[abc]ef', 'abcabccdcdcdabcabcef'],
     ['abc3[cd]xyz', 'abccdcdcdxyz'],
 ]
     .map((pair) => `${pair[0]} ==> [${decodeString(pair[0]) === pair[1]}]`)
