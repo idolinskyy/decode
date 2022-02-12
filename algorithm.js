@@ -3,20 +3,16 @@ const decodeString = (source) => {
     const stack = [];
 
     while (index < source.length) {
-        const char = source[index];
-
-        if (char === '[') {
-            stack.push(index++);
-        } else if (/\d+/.test(char)) {
-            const int = parseInt(source.substring(index));
-            stack.push(int);
-            index += String(int).length;
-        } else if (char === ']') {
-            const begin = stack.pop();
-            const int = stack.pop();
-            const block = source.substring(begin + 1, index);
-            const fullBlock = `${int}[${block}]`;
-            const replaceString = block.repeat(int);
+        if (/\d+/.test(source[index])) {
+            const count = parseInt(source.substring(index));
+            index += String(count).length;
+            const position = index++; // '['
+            stack.push({ count, position });
+        } else if (source[index] === ']') {
+            const { count, position } = stack.pop();
+            const block = source.substring(position + 1, index);
+            const fullBlock = `${count}[${block}]`;
+            const replaceString = block.repeat(count);
             source = source.replace(fullBlock, replaceString);
             index += replaceString.length - fullBlock.length + 1;
         } else {
@@ -27,6 +23,11 @@ const decodeString = (source) => {
 };
 
 // test
-['3[a]2[bc]', '3[a2[c]]', '2[abc]3[dc]f', 'abc3[cd]xyz']
-    .map((source) => `${source} ==> ${decodeString(source)}`)
+[
+    ['3[a]2[bc]', 'aaabcbc'],
+    ['3[a2[c]]', 'accaccacc'],
+    ['2[abc]3[cd]ef', 'abcabccdcdcdef'],
+    ['abc3[cd]xyz', 'abccdcdcdxyz'],
+]
+    .map((pair) => `${pair[0]} ==> [${decodeString(pair[0]) === pair[1]}]`)
     .forEach((item) => console.log(item));
