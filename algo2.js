@@ -9,4 +9,4 @@ const decodeString = (source) => {
     return source;
 };
 
-export { decodeString };
+export default decodeString;
